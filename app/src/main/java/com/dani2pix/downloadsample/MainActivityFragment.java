@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Observer;
@@ -25,31 +28,32 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+         final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar2);
 
-
-        Download download = new Download();
-        Observable<Double> observable = download.doDownload("http://i.4cdn.org/wg/1479226704603.png");
-        observable.observeOn(AndroidSchedulers.mainThread())
+        Download.doDownload("http://i.4cdn.org/wg/1478943911746.jpg")
+                .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Double>() {
-            @Override
-            public void onCompleted() {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Double>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d("onCompleted", "DONE");
+                    }
 
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("onError", e.getMessage());
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Double o) {
-                Log.d("YES", o.toString());
-            }
-        });
-
+                    @Override
+                    public void onNext(Double o) {
+                        progressBar.setProgress(o.intValue());
+                        Log.d("onNext", o.toString());
+                    }
+                });
 
 
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        return view;
     }
 }
