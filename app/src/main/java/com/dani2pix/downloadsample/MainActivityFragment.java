@@ -31,7 +31,7 @@ public class MainActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
          final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar2);
 
-        Download.doDownload("http://scholar.princeton.edu/sites/default/files/oversize_pdf_test_0.pdf")
+        Download.doDownload("http://downloads.4ksamples.com/downloads/sample-Elysium.2013.2160p.mkv")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Double>() {

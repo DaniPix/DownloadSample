@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
@@ -40,17 +41,17 @@ public class Download {
                 try {
                     Call runningRequest = client.newCall(request);
                     Response response = runningRequest.execute();
-
+                    Buffer buffer = new Buffer();
                     if (response.isSuccessful()) {
                         ResponseBody responseBody = response.body();
                         long contentLength = responseBody.contentLength();
                         BufferedSource bufferedSource = responseBody.source();
-                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/myPicture.pdf");
+                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/myPicture.mkv");
                         BufferedSink sink = Okio.buffer(Okio.sink(file));
                         subscriber.onNext(0.0);
                         double total = 0;
                         double read;
-                        while ((read = bufferedSource.read(sink.buffer(), 8 * 1024)) != -1) {
+                        while ((read = bufferedSource.read(sink.buffer(), 2048)) != -1) {
                             total += read;
                             subscriber.onNext((total / contentLength) * 100);
                         }
