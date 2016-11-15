@@ -20,8 +20,6 @@ import okio.Okio;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 
 /**
@@ -47,18 +45,12 @@ public class Download {
                         ResponseBody responseBody = response.body();
                         long contentLength = responseBody.contentLength();
                         BufferedSource bufferedSource = responseBody.source();
-                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/myPicture.jpg");
+                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/myPicture.pdf");
                         BufferedSink sink = Okio.buffer(Okio.sink(file));
                         subscriber.onNext(0.0);
                         double total = 0;
                         double read;
-                        while ((read = bufferedSource.read(sink.buffer(), 2048)) != -1) {
-                            if (subscriber.isUnsubscribed()) {
-                                runningRequest.cancel();
-                                responseBody.close();
-                                return;
-                            }
-
+                        while ((read = bufferedSource.read(sink.buffer(), 8 * 1024)) != -1) {
                             total += read;
                             subscriber.onNext((total / contentLength) * 100);
                         }
@@ -74,9 +66,6 @@ public class Download {
                     Log.e(getClass().getName(), e.getMessage(), e);
                 }
             }
-        });
-
-
-
+        }).sample(1000, TimeUnit.MILLISECONDS);
     }
 }
